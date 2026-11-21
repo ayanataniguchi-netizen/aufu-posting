@@ -143,6 +143,30 @@ body{font-size:16px;line-height:1.5}
 #p-backup-note,#field-import-status,#field-status{overflow-wrap:anywhere}
 .header-row,.header-context{min-width:0}
 @media(max-width:390px){.posting-main{padding-inline:12px}.posting-head{padding-inline:12px}}
+</style><style>
+.count-card .number{justify-content:center;gap:7px}
+.count-card .number strong{font-size:clamp(54px,16vw,74px);line-height:1.02}
+.count-card p{text-align:center;margin:4px 0 8px}
+.count-card progress{width:100%;margin:0 0 3px}
+.time-card{grid-template-columns:repeat(2,minmax(0,1fr))}
+.time-card div{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:9px 6px}
+.time-card div strong{font-size:clamp(17px,5vw,21px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#p-actions .action-heading{margin-bottom:3px}
+#p-actions .disabled-reason{margin:0 0 4px}
+#p-actions .dock-flow,#p-actions[data-phase=run] .dock-flow{padding:0;margin-top:8px;gap:13px}
+#p-actions .dock-flow:not([hidden])+.count-buttons,#p-actions[data-phase=run] .dock-flow+.count-buttons{margin-top:13px}
+#p-actions .count-buttons{gap:13px;margin-top:6px}
+#p-actions .stop-note{margin-top:7px}
+#p-actions[data-phase=prep] #p-primary,#p-actions[data-phase=travel] #p-primary{background:#294C65;color:#fff;border-color:#294C65}
+#p-actions #p-plus:disabled{color:#30485f;background:#e3ebf3;border-color:#aebfd0}
+.google-actions{margin:9px 0 11px;padding:10px 11px;background:#fff;border:1px solid var(--line);border-radius:13px;color:var(--ink)}
+.google-actions h2{font-size:16px;margin:0 0 7px}
+.google-actions .google-links{display:grid;grid-template-columns:1fr;gap:7px}
+#posting .google-links a{display:flex;align-items:center;justify-content:center;text-align:center;min-height:44px;font-size:14px;text-decoration:none}
+#posting .google-links a.green{color:#fff}
+.google-actions p{margin:6px 0 0;line-height:1.5;font-size:13px}
+.google-actions [aria-disabled=true]{background:#e5edf5!important;color:#38526b!important;border-color:#c0d0e0!important;cursor:default}
+#p-google-status:not(:empty){color:#69420e;background:#fff2dc;padding:6px 8px;border-radius:8px}
 </style><body><div id="posting">
  <header class="posting-head"><div class="header-row"><div class="brand">AUFU POSTING</div><button id="p-menu" class="plain" type="button" aria-label="設定" aria-controls="p-settings" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.7 3h4.6l.5 2.7 1.3.7 2.6-.9 2.3 4-2.1 1.8v1.5l2.1 1.8-2.3 4-2.6-.9-1.3.7-.5 2.6H9.7l-.5-2.6-1.3-.7-2.6.9-2.3-4 2.1-1.8v-1.5L3 9.5l2.3-4 2.6.9 1.3-.7z"/><circle cx="12" cy="12" r="2.8"/></svg><span>設定</span></button></div><div class="header-context"><p class="today" id="p-today"></p><span id="p-status" class="pill"></span></div></header>
  <p id="p-test-banner" class="test-banner" role="status" hidden>テスト中 <span>本番実績・予測には反映されません</span></p>
@@ -160,7 +184,17 @@ body{font-size:16px;line-height:1.5}
   </section>
   <section id="p-map" hidden>
    <h1>当日の地図</h1><p id="p-map-area"></p>
-   <p id="p-gaps" class="map-caution"></p><div class="map-stage"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
+   <p id="p-gaps" class="map-caution"></p>
+<div class="google-actions">
+ <h2>Googleマップで移動を確認</h2>
+ <div class="google-links">
+  <a id="p-google-start" class="green" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-start-note">Googleマップで開始地点へ</a>
+  <a id="p-google-home" class="plain" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-home-note">Googleマップで帰路を確認</a>
+ </div>
+ <p id="p-google-start-note"></p><p id="p-google-home-note"></p>
+ <p>Googleの案内は計画ルートと別です。自転車経路が出ない場合、徒歩経路は参考にとどめ、通行規制・私道の制限を優先してください。停車してから操作してください。</p>
+ <p id="p-google-status" role="alert"></p>
+</div><div class="map-stage"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
    <ul class="map-key"><li><strong>開始</strong> <a id="p-start-map">開始地点</a></li><li><strong>終了</strong> <a id="p-end-map">配布終了・復路開始点</a></li><li><strong>折り返し</strong> 地図の終了地点が予定地点です。通行不可・接続不明・時間不足なら手前で戻ります。</li></ul>
    <p id="p-slopes"></p>
    <button id="p-locate" type="button" class="plain">端末の現在地を確認</button><p id="p-coords" role="status"></p>
@@ -648,8 +682,7 @@ optForm.onsubmit=ev=>{
   by('p-status').dataset.phase=phase;
   const op=by('p-actions');op.dataset.phase=phase;
   const plusRow=op.querySelector('.count-buttons'), flow=op.querySelector('.dock-flow');
-  if(phase==='run'&&plusRow.previousElementSibling===flow)op.insertBefore(plusRow,flow);
-  if(phase!=='run'&&flow.previousElementSibling===plusRow)op.insertBefore(flow,plusRow);
+  if(flow.previousElementSibling===plusRow)op.insertBefore(flow,plusRow);
   by('p-count').textContent=count;
   const pct=p.posts?Math.round(count/p.posts*100):0;
   by('p-plan').textContent='標準目標 '+p.posts+'通　·　進捗 '+pct+'%';
@@ -695,9 +728,48 @@ optForm.onsubmit=ev=>{
   }
   by('p-map-area').textContent=(mapPreview?'比較中の基本ルート '+p.date:day.value)+'　'+p.area+' · '+p.road;
   by('p-start-map').href=p.start;by('p-end-map').href=p.end;
+  renderGoogleNavigation(p);
   by('p-gaps').textContent=p.gaps.length?'現地確認が必要：'+p.gaps.join('、')+'。接続を確認できない場合は手前で戻ります。':'既存資料に接続ギャップの注記なし。通行条件は当日確認。';
   by('p-slopes').textContent='坂道・通行注意　'+p.slopes+'。局所勾配は参考値です。急坂は安全な場所で降りて押し歩き。投函・立入禁止は除外。';
  }
+
+ const googleMaps={"starts":{"2026-12-01":[34.87695,139.119646],"2026-12-02":[34.879333,139.114021],"2026-12-03":[34.891255,139.126991],"2026-12-04":[34.89406,139.118481],"2026-12-05":[34.883949,139.113467],"2026-12-06":[34.883972,139.099817],"2026-12-07":[34.891438,139.097384],"2026-12-08":[34.893208,139.086179],"2026-12-09":[34.896941,139.115258],"2026-12-10":[34.905265,139.104384]},"positions":{"空":[34.8891969,139.1293697],"森":[34.8918939,139.1185593]}};
+ function routeURL(point){
+  if(!Array.isArray(point)||point.length!==2||!point.every(Number.isFinite)||Math.abs(point[0])>90||Math.abs(point[1])>180)return null;
+  return 'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:point.join(','),travelmode:'bicycling'});
+ }
+ function setDestination(link,point){
+  const href=routeURL(point);
+  if(href){link.href=href;link.removeAttribute('aria-disabled');link.removeAttribute('tabindex');}
+  else{link.removeAttribute('href');link.setAttribute('aria-disabled','true');link.setAttribute('tabindex','-1');}
+ }
+ function renderGoogleNavigation(p){
+  const selectedSite=session()?.site??site.value;
+  const start=googleMaps.starts[p.date], home=googleMaps.positions[selectedSite];
+  setDestination(by('p-google-start'),start);
+  setDestination(by('p-google-home'),home);
+  by('p-google-start-note').textContent=start?'開始地点は計画上の座標です。現地で使える進入口を確認してください。':'開始地点の座標は未確認です。地図で確認してください。';
+  by('p-google-home-note').textContent=home?selectedSite+'（登録済みの地図上の位置）。実入口と帰路の通行条件は現地で確認してください。':selectedSite?'「'+selectedSite+'」の実入口は未確認です。確定するまで帰路リンクを利用できません。':'設定で滞在施設を選択してください。';
+ }
+ function verifyMapStorage(e){
+  const info=by('p-google-status');
+  info.textContent='';
+  try{
+   if(!e.currentTarget.hasAttribute('href')){e.preventDefault();return;}
+   const currentMode=sessionStorage.getItem(modeKey);
+   // Do not open the other app if this page cannot continue in the same mode.
+   if(testing&&currentMode!=='on')throw Error('テストモードを保存できません。');
+   if(!testing&&currentMode==='on')throw Error('モードの保存状態を確認してください。');
+   if(session())saveData(data);
+   else{
+    if(loadError||localStorage.getItem(stateKey)!==lastRaw)throw Error('投函記録の状態を確認してください。');
+    const probe=stateKey+'-map-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);
+   }
+   if(navigator.onLine===false)throw Error('外部のGoogleマップには通信が必要です。同梱地図は利用できます。');
+  }catch(err){e.preventDefault();info.textContent='Googleマップを開いていません。'+(err.message?.startsWith('外部の')?err.message:'保存領域を確認できません。記録を確認してから再試行してください。');}
+ }
+ for(const id of ['p-google-start','p-google-home'])by(id).addEventListener('click',verifyMapStorage);
+
  function showMapError(failed){
   by('p-map-image').hidden=failed;
   by('p-map-fallback').hidden=!failed;
