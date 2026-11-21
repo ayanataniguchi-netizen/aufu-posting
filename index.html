@@ -183,7 +183,7 @@ body{font-size:16px;line-height:1.5}
 #p-actions #p-save{display:block;min-height:19px;margin:0;font-size:12px;line-height:1.5;padding:0;border:0;border-radius:0;background:none;color:#435970}
 #p-actions #p-save[data-error=true]{display:block;background:#fff1df;color:#713517;margin-top:3px;border:1px solid #edd1ad;border-radius:7px;padding:4px 6px;font-weight:750}
 #p-history-toggle{width:100%;min-height:44px}
-</style><body><div id="posting">
+</style><style>.pin-frame{position:relative}.pin-layer{position:absolute;inset:0;pointer-events:none}.posting-pin{pointer-events:auto;position:absolute;transform:translate(-50%,-50%);width:44px;height:44px;border:0;background:transparent;color:#17324e;isolation:isolate;display:grid;place-items:center;font:800 16px/1 system-ui,sans-serif;text-shadow:0 1px 1px #fff;cursor:pointer}.posting-pin:before{content:'';position:absolute;width:27px;height:27px;border-radius:50%;background:#e5f0fc;border:2px solid #214c73;box-shadow:0 2px 5px #10213c55;z-index:-1}.gps-survey{position:relative;max-width:250px;aspect-ratio:1;margin:9px auto;background:#eef3f8;background-image:linear-gradient(#d4deeb 1px,transparent 1px),linear-gradient(90deg,#d4deeb 1px,transparent 1px);background-size:20px 20px;border:1px solid #aabdd1;border-radius:10px}#p-gps-detail{padding:8px 10px;background:#e8f0f9;border:1px solid #cbd9e9;color:#193b58;border-radius:9px;font-size:14px}#p-gps-summary{margin:4px 0 7px;color:#435970}</style><body><div id="posting">
  <header class="posting-head"><div class="header-row"><div class="brand">AUFU POSTING</div><button id="p-menu" class="plain" type="button" aria-label="設定" aria-controls="p-settings" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.7 3h4.6l.5 2.7 1.3.7 2.6-.9 2.3 4-2.1 1.8v1.5l2.1 1.8-2.3 4-2.6-.9-1.3.7-.5 2.6H9.7l-.5-2.6-1.3-.7-2.6.9-2.3-4 2.1-1.8v-1.5L3 9.5l2.3-4 2.6.9 1.3-.7z"/><circle cx="12" cy="12" r="2.8"/></svg><span>設定</span></button></div><div class="header-context"><p class="today" id="p-today"></p><span id="p-status" class="pill"></span></div></header>
  <p id="p-test-banner" class="test-banner" role="status" hidden>テスト中 <span>本番実績・予測には反映されません</span></p>
  <main class="posting-main">
@@ -194,20 +194,23 @@ body{font-size:16px;line-height:1.5}
    <div class="time-card"><div><span>配布の経過</span><strong id="p-elapsed">—</strong></div><div><span>210分の残り</span><strong id="p-remaining">—</strong></div></div>
    <p id="p-turn" class="muted"></p>  <div id="p-actions" class="operation-card"><p class="action-heading">配布操作</p>
   <p id="p-disabled-reason" class="disabled-reason"><span id="p-next-step"></span> <button type="button" id="p-setup-shortcut" class="dock-link" hidden></button></p>
-  <div class="count-buttons"><button id="p-minus" type="button" class="plain" aria-describedby="p-undo-reason" aria-label="1通取り消す"><span aria-hidden="true">↶</span> 1通取り消す</button><span id="p-undo-reason" hidden></span><button id="p-plus" class="green" type="button" aria-describedby="p-disabled-reason">＋1通 投函</button></div><div class="dock-flow flow"><button type="button" id="p-primary" class="plain">施設を出発</button><button type="button" id="p-secondary" class="plain" hidden></button></div><div class="action-footer"><p class="stop-note">安全な場所で停車してから操作</p><p id="p-save" class="message" role="status"></p></div></div>
+  <div class="count-buttons"><button id="p-minus" type="button" class="plain" aria-describedby="p-undo-reason" aria-label="1通取り消す"><span aria-hidden="true">↶</span> 1通取り消す</button><span id="p-undo-reason" hidden></span><button id="p-plus" class="green" type="button" aria-describedby="p-disabled-reason">＋1通 投函</button></div><div class="dock-flow flow"><button type="button" id="p-primary" class="plain">施設を出発</button><button type="button" id="p-secondary" class="plain" hidden></button></div><div class="action-footer"><p class="stop-note">停車して投函。GPSは端末内に保存し、未取得でも投函を記録します。</p><p id="p-save" class="message" role="status"></p></div></div>
 
    
   </section>
   <section id="p-map" hidden>
    <div class="map-intro"><h1>当日の地図</h1><p id="p-map-area"></p><p id="p-map-brief" class="map-brief"></p></div>
-   <div class="map-stage"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
+   <p id="p-gps-summary" class="map-brief"></p><div class="map-stage"><div class="pin-frame"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-pin-layer" class="pin-layer" aria-label="投函GPSピン"></div></div><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
+   <p id="p-gps-detail" role="status" hidden></p>
+   <details id="p-gps-extra" hidden><summary>同梱地図の範囲外にある投函位置</summary><p>北が上の測位図です。この図に道路は表示されません。</p><div id="p-gps-survey" class="gps-survey"></div></details>
    <div class="google-actions">
  <h2>Googleマップで移動を確認</h2>
  <div class="google-links">
   <a id="p-google-start" class="green" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-start-note">Googleマップで開始地点へ</a>
+  <a id="p-google-plan" class="plain" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-plan-note">Googleマップで配布の道順を確認</a>
   <a id="p-google-home" class="plain" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-home-note">Googleマップで帰路を確認</a>
  </div>
- <p id="p-google-start-note"></p><p id="p-google-home-note"></p>
+ <p id="p-google-start-note"></p><p id="p-google-plan-note"></p><p id="p-google-home-note"></p>
  
  <p id="p-google-status" role="alert"></p>
 </div>
@@ -541,6 +544,9 @@ optForm.onsubmit=ev=>{
 </script><script>(()=>{
  const plans=[{"id": 1, "date": "2026-12-01", "road": "A1 → A2", "posts": 16, "innerBack": 18, "facilities": {"空": {"out": 20, "back": 21, "eligible": true}, "森": {"out": 17, "back": 29, "eligible": true}, "燈": {"out": 8, "back": 9, "eligible": false}, "煖": {"out": 11, "back": 15, "eligible": false}}, "gaps": [], "area": "城ヶ崎", "start": "https://maps.gsi.go.jp/#17/34.876950/139.119646/", "end": "https://maps.gsi.go.jp/#17/34.884736/139.125007/", "slopes": "A1 -12.3%、A2 12.6%"}, {"id": 2, "date": "2026-12-02", "road": "A6 → A5", "posts": 19, "innerBack": 11, "facilities": {"空": {"out": 15, "back": 15, "eligible": true}, "森": {"out": 13, "back": 23, "eligible": true}, "燈": {"out": 7, "back": 6, "eligible": false}, "煖": {"out": 7, "back": 10, "eligible": false}}, "gaps": ["A6→A5"], "area": "城ヶ崎・萩ケ洞", "start": "https://maps.gsi.go.jp/#17/34.879333/139.114021/", "end": "https://maps.gsi.go.jp/#17/34.885574/139.119562/", "slopes": "A6 9.4%、A5 16.9%"}, {"id": 3, "date": "2026-12-03", "road": "C1 → C4 → C3逆", "posts": 20, "innerBack": 9, "facilities": {"空": {"out": 10, "back": 9, "eligible": true}, "森": {"out": 12, "back": 23, "eligible": true}, "燈": {"out": 19, "back": 18, "eligible": false}, "煖": {"out": 11, "back": 14, "eligible": false}}, "gaps": ["C1→C4", "C4→C3逆"], "area": "富戸・駅東側", "start": "https://maps.gsi.go.jp/#17/34.891255/139.126991/", "end": "https://maps.gsi.go.jp/#17/34.891532/139.127373/", "slopes": "C1 14.0%、C4 -7.8%、C3逆 6.7%"}, {"id": 4, "date": "2026-12-04", "road": "C2 → C5", "posts": 18, "innerBack": 8, "facilities": {"空": {"out": 28, "back": 15, "eligible": true}, "森": {"out": 8, "back": 6, "eligible": true}, "燈": {"out": 38, "back": 19, "eligible": false}, "煖": {"out": 22, "back": 13, "eligible": false}}, "gaps": [], "area": "富戸・街道下", "start": "https://maps.gsi.go.jp/#17/34.894060/139.118481/", "end": "https://maps.gsi.go.jp/#17/34.897450/139.115209/", "slopes": "C2 16.2%、C5 7.7%"}, {"id": 5, "date": "2026-12-05", "road": "D2", "posts": 22, "innerBack": 8, "facilities": {"空": {"out": 14, "back": 11, "eligible": true}, "森": {"out": 10, "back": 17, "eligible": true}, "燈": {"out": 12, "back": 9, "eligible": false}, "煖": {"out": 4, "back": 5, "eligible": false}}, "gaps": [], "area": "八幡野側", "start": "https://maps.gsi.go.jp/#17/34.883949/139.113467/", "end": "https://maps.gsi.go.jp/#17/34.880284/139.109661/", "slopes": "D2 -10.7%"}, {"id": 6, "date": "2026-12-06", "road": "E3 → E0 → E2", "posts": 17, "innerBack": 12, "facilities": {"空": {"out": 29, "back": 20, "eligible": true}, "森": {"out": 20, "back": 20, "eligible": true}, "燈": {"out": 28, "back": 18, "eligible": false}, "煖": {"out": 19, "back": 13, "eligible": false}}, "gaps": [], "area": "すいらん荘周辺", "start": "https://maps.gsi.go.jp/#17/34.883972/139.099817/", "end": "https://maps.gsi.go.jp/#17/34.891625/139.098803/", "slopes": "E3 8.4%、E0 6.2%、E2 11.0%"}, {"id": 7, "date": "2026-12-07", "road": "E5逆 → E4", "posts": 17, "innerBack": 7, "facilities": {"空": {"out": 41, "back": 22, "eligible": true}, "森": {"out": 26, "back": 17, "eligible": true}, "燈": {"out": 41, "back": 20, "eligible": false}, "煖": {"out": 31, "back": 15, "eligible": false}}, "gaps": ["E5逆→E4"], "area": "すいらん荘周辺", "start": "https://maps.gsi.go.jp/#17/34.891438/139.097384/", "end": "https://maps.gsi.go.jp/#17/34.893009/139.097627/", "slopes": "E5逆 -10.8%、E4 15.2%"}, {"id": 8, "date": "2026-12-08", "road": "G1 → G3", "posts": 14, "innerBack": 6, "facilities": {"空": {"out": 51, "back": 31, "eligible": true}, "森": {"out": 31, "back": 21, "eligible": true}, "燈": {"out": 52, "back": 29, "eligible": false}, "煖": {"out": 42, "back": null, "eligible": false}}, "gaps": ["G1→G3"], "area": "南大室台周辺", "start": "https://maps.gsi.go.jp/#17/34.893208/139.086179/", "end": "https://maps.gsi.go.jp/#17/34.895670/139.086071/", "slopes": "G1 13.2%、G3 -8.5%"}, {"id": 9, "date": "2026-12-09", "road": "F1 → F4", "posts": 15, "innerBack": 12, "facilities": {"空": {"out": 37, "back": 22, "eligible": true}, "森": {"out": 19, "back": 9, "eligible": true}, "燈": {"out": 43, "back": 20, "eligible": false}, "煖": {"out": 32, "back": null, "eligible": false}}, "gaps": [], "area": "大室高原東側周辺", "start": "https://maps.gsi.go.jp/#17/34.896941/139.115258/", "end": "https://maps.gsi.go.jp/#17/34.906757/139.117038/", "slopes": "F1 7.4%、F4 12.6%"}, {"id": 10, "date": "2026-12-10", "road": "F3", "posts": 9, "innerBack": 9, "facilities": {"空": {"out": 74, "back": 30, "eligible": true}, "森": {"out": 54, "back": 19, "eligible": true}, "燈": {"out": 75, "back": 28, "eligible": false}, "煖": {"out": 65, "back": 23, "eligible": false}}, "gaps": [], "area": "大室山東麓", "start": "https://maps.gsi.go.jp/#17/34.905265/139.104384/", "end": "https://maps.gsi.go.jp/#17/34.905854/139.099707/", "slopes": "F3 15.5%"}];
  const by=id=>document.getElementById(id);
+ const gpsMaps={"2026-12-01":{"x":29743966,"y":13303818,"scale":0.704225352112676,"px":54,"py":120,"right":696,"bottom":920,"width":750,"height":1170,"route":{"origin":[34.8769502144233,139.119646026406],"end":[34.8847360321738,139.125007374143],"waypoints":[[34.878422942488,139.123758607202],[34.8804833899438,139.123629876825],[34.8819547098312,139.126086637075]]}},"2026-12-02":{"x":29743442,"y":13303708,"scale":0.8205128205128205,"px":21,"py":120,"right":729,"bottom":920,"width":750,"height":1233,"route":null},"2026-12-03":{"x":29744552,"y":13302757,"scale":1.3986013986013985,"px":7,"py":120,"right":743,"bottom":920,"width":750,"height":1233,"route":null},"2026-12-04":{"x":29743553,"y":13302373,"scale":1.2066365007541477,"px":21,"py":120,"right":728,"bottom":920,"width":750,"height":1170,"route":{"origin":[34.8940597363652,139.11848097167],"end":[34.8974503702667,139.115208616601],"waypoints":[[34.8939190795502,139.117812263077],[34.895076657342,139.117005063014],[34.8959526722036,139.116419978592]]}},"2026-12-05":{"x":29743036,"y":13303908,"scale":1.1811023622047243,"px":0,"py":126,"right":750,"bottom":914,"width":750,"height":1170,"route":{"origin":[34.8839493587627,139.113466671874],"end":[34.8802839572851,139.109660617813],"waypoints":[[34.8831466958029,139.113182479952],[34.8823069479389,139.112189188488],[34.880929584369,139.110864514804]]}},"2026-12-06":{"x":29742024,"y":13303035,"scale":0.7136485280999108,"px":191,"py":120,"right":559,"bottom":920,"width":750,"height":1170,"route":{"origin":[34.8839715025722,139.099816969659],"end":[34.8916249115336,139.098803141809],"waypoints":[[34.8849992797383,139.100688635522],[34.8867470171494,139.100955957083],[34.88820331526,139.099512535999]]}},"2026-12-07":{"x":29741848,"y":13302862,"scale":1.5,"px":0,"py":161,"right":750,"bottom":879,"width":750,"height":1233,"route":null},"2026-12-08":{"x":29740787,"y":13302576,"scale":1.503006012024048,"px":0,"py":121,"right":750,"bottom":919,"width":750,"height":1233,"route":null},"2026-12-09":{"x":29743549,"y":13301316,"scale":0.5856515373352855,"px":211,"py":120,"right":538,"bottom":920,"width":750,"height":1170,"route":{"origin":[34.8969405950473,139.115258472201],"end":[34.9067566084276,139.117037888353],"waypoints":[[34.8995933895819,139.117124929714],[34.9028517467413,139.117974482648],[34.9049454762248,139.117106439691]]}},"2026-12-10":{"x":29742108,"y":13301412,"scale":1.0460251046025104,"px":0,"py":269,"right":750,"bottom":770,"width":750,"height":1170,"route":{"origin":[34.9052652941974,139.10438444384],"end":[34.905854328224,139.099707160497],"waypoints":[[34.9041667981608,139.102159937617],[34.904075723609,139.100702172235],[34.9045951894788,139.100432869889]]}}};
+ let gpsPending=null;
+ const gpsStatuses=new Set(['fixed','pending','cancelled','denied','timeout','failed','insecure','unsupported','interrupted']);
  const legacyKey='aufu-bike-field-2026-12-v1', liveKey='aufu-posting-counter-v1', testKey='aufu-posting-practice-v1';
  const modeKey='aufu-posting-practice-tab-v1';
  let testing=false;
@@ -586,6 +592,14 @@ optForm.onsubmit=ev=>{
   for(const [d,x] of Object.entries(records)){
    if(!plans.some(p=>p.date===d)||!x||!sites.includes(x.site)||!Number.isInteger(x.route)||!plans[x.route]||!Array.isArray(x.events)||!x.events.length||x.events.length>20000)throw Error('日付・施設・ルートまたは履歴を確認してください。');
    summarize(x.events);
+   const ids=new Set();
+   for(const e of x.events){
+    if(e.id!==undefined){
+     if(typeof e.id!=='string'||!e.id||e.id.length>100||ids.has(e.id))throw Error('投函の識別情報が不正です。');
+     ids.add(e.id);
+    }
+    if(e.gps!==undefined&&(!e.gps||e.type!=='plus'||!gpsStatuses.has(e.gps.status)||(e.gps.status==='fixed'&&!coordinatesOK(e.gps))))throw Error('位置情報が不正です。');
+   }
   }
   return records;
  }
@@ -640,16 +654,27 @@ optForm.onsubmit=ev=>{
    }
    if(!x)return;
    const now=Date.now(), current=summarize(x.events);
-   if(type==='plus'&&now-lastTap<300)return;
+   if(type==='plus'&&(gpsPending||now-lastTap<300))return;
    if(type==='plus'&&x.events.length>=19990)throw Error('履歴の上限です。バックアップしてください。');
    if(type==='minus'&&current.count===0)return;
    if(!Object.prototype.hasOwnProperty.call(transitions[current.phase],type))return;
    if(now<current.last)throw Error('端末の時刻が前回記録より前です。');
-   const update={...x,events:[...x.events,{type,at:now}]};
+   const entry={type,at:now};
+   if(type==='plus'){
+    entry.id=globalThis.crypto?.randomUUID?.()??Date.now().toString(36)+':'+Math.random().toString(36).slice(2);
+    entry.gps={status:'pending'};
+   }
+   const removed=type==='minus'?activePosts(x.events).at(-1)?.e:null;
+   const events=removed?.gps?x.events.map(e=>e===removed?{...e,gps:{status:'cancelled'}}:e):x.events;
+   const update={...x,events:[...events,entry]};
    const next={...data,[day.value]:update};
    saveData(next);
-   if(type==='plus')lastTap=now;
-   announce(type==='plus'?'1通を自動保存しました。':type==='minus'?'1通の取り消しを保存しました。':actions[type]+'を保存しました。');
+   if(type==='plus'){
+    lastTap=now;const date=day.value,key=stateKey;
+    announce('1通を自動保存しました。GPSを確認中です。');
+    requestGPS(date,key,entry.id);
+    render();
+   }else announce(type==='minus'?'1通の取り消しを保存しました。':actions[type]+'を保存しました。');
   }catch(e){announce('保存できませんでした。'+e.message,true);}
  }
  const num=x=>String(Math.max(0,Math.floor(x))).padStart(2,'0');
@@ -710,7 +735,7 @@ optForm.onsubmit=ev=>{
   const primary={prep:['施設を出発','depart'],travel:['配布を開始','start'],run:['一時停止','pause'],pause:['配布を再開','resume'],return:['施設に帰着','home'],done:[]}[phase];
   setupButton(by('p-primary'),...primary);
   setupButton(by('p-secondary'),...(['run','pause'].includes(phase)?['配布を終了','end']:[]));
-  by('p-plus').disabled=phase!=='run'||loadError;
+  by('p-plus').disabled=phase!=='run'||loadError||!!gpsPending;
   by('p-minus').disabled=!['run','pause','return'].includes(phase)||count===0||loadError;
   const shortcut=by('p-setup-shortcut'), hint=by('p-next-step');
   shortcut.hidden=true;
@@ -726,6 +751,7 @@ optForm.onsubmit=ev=>{
   else if(phase==='pause')next='一時停止中です。「配布を再開」を押すと投函できます。';
   else if(phase==='return')next='配布は終了しました。施設に着いたら「施設に帰着」を押します。';
   else if(phase==='done')next='この日の投函は終了しました。記録タブから確認できます。';
+  else if(gpsPending)next='投函は保存済みです。位置情報を確認中です（最大2.3秒）。';
   else if(count===0)next='投函前は取り消しできません。';
   hint.textContent=next;
   op.querySelector('.dock-flow').hidden=phase==='done';
@@ -747,9 +773,117 @@ optForm.onsubmit=ev=>{
   by('p-map-area').textContent=(mapPreview?'比較中の基本ルート '+p.date:day.value)+'　'+p.area+' · '+p.road;
   by('p-start-map').href=p.start;by('p-end-map').href=p.end;
   renderGoogleNavigation(p);
+  renderGPS(p);
   by('p-map-brief').textContent=p.gaps.length?'接続未確認 '+p.gaps.length+'箇所・坂道の注意あり':'坂道・通行条件は現地確認';
   by('p-gaps').textContent=p.gaps.length?'現地確認が必要：'+p.gaps.join('、')+'。接続を確認できない場合は手前で戻ります。':'既存資料に接続ギャップの注記なし。通行条件は当日確認。';
   by('p-slopes').textContent='坂道・通行注意　'+p.slopes+'。局所勾配は参考値です。急坂は安全な場所で降りて押し歩き。投函・立入禁止は除外。';
+ }
+
+ function activePosts(events){
+  const active=[];let count=0;
+  for(const e of events){
+   if(e.type==='plus'){count++;active.push({e,count});}
+   if(e.type==='minus'){count--;active.pop();}
+  }
+  return active;
+ }
+ function coordinatesOK(g){
+  return Number.isFinite(g.lat)&&Number.isFinite(g.lon)&&Number.isFinite(g.accuracy)&&Math.abs(g.lat)<=90&&Math.abs(g.lon)<=180&&g.accuracy>=0;
+ }
+ function gpsLabel(e){
+  const state=e.gps?.status;
+  if(state==='fixed')return 'GPS取得（精度 約'+Math.round(e.gps.accuracy)+'m）';
+  if(state==='cancelled')return '位置情報取消済み';
+  if(state==='pending'&&gpsPending?.id===e.id)return 'GPS取得中';
+  const suffix={denied:'許可なし',timeout:'時間切れ',failed:'取得失敗',insecure:'HTTPSが必要',unsupported:'端末非対応',interrupted:'中断',pending:'中断'};
+  return 'GPS未取得'+(suffix[state]?'（'+suffix[state]+'）':'');
+ }
+ function requestGPS(date,key,id){
+  let settled=false,timer;
+  const finish=g=>{
+   if(settled)return;
+   settled=true;clearTimeout(timer);gpsPending=null;
+   // A switch of date or mode must not write to the wrong record.
+   if(stateKey!==key){render();return;}
+   const x=data[date], target=x&&activePosts(x.events).find(v=>v.e.id===id)?.e;
+   if(!target||target.gps?.status!=='pending'){render();return;}
+   const next={...data,[date]:{...x,events:x.events.map(e=>e===target?{...e,gps:g}:e)}};
+   try{
+    saveData(next);
+    if(day.value===date){
+     const message=g.status==='fixed'?'1通と位置情報を保存しました。':'1通を保存しました。'+gpsLabel({gps:g})+'。';
+     if(!error){announce(message);return;}
+    }
+    render();
+   }catch(e){announce('投函は保存済みですが、位置情報を保存できませんでした。',true);}
+  };
+  gpsPending={id,finish};
+  if(!window.isSecureContext){finish({status:'insecure'});return;}
+  if(!navigator.geolocation){finish({status:'unsupported'});return;}
+  if(document.hidden){finish({status:'interrupted'});return;}
+  timer=setTimeout(()=>finish({status:'timeout'}),2300);
+  try{
+   navigator.geolocation.getCurrentPosition(
+    ({coords:c})=>{
+     if(document.hidden){finish({status:'interrupted'});return;}
+     const g={status:'fixed',lat:c.latitude,lon:c.longitude,accuracy:c.accuracy};
+     finish(coordinatesOK(g)?g:{status:'failed'});
+    },
+    e=>finish({status:e.code===1?'denied':e.code===3?'timeout':'failed'}),
+    {enableHighAccuracy:true,maximumAge:0,timeout:2200}
+   );
+  }catch{finish({status:'failed'});}
+ }
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)gpsPending?.finish({status:'interrupted'});});
+ window.addEventListener('pagehide',()=>gpsPending?.finish({status:'interrupted'}));
+ function mercator(lat,lon){
+  const z=256*2**17,rad=Math.min(85.05112878,Math.max(-85.05112878,lat))*Math.PI/180;
+  return [(lon+180)/360*z,(1-Math.asinh(Math.tan(rad))/Math.PI)/2*z];
+ }
+ function renderGPS(p){
+  const layer=by('p-pin-layer'), extra=by('p-gps-extra'), survey=by('p-gps-survey');
+  layer.replaceChildren();survey.replaceChildren();
+  by('p-gps-detail').textContent='';
+  by('p-gps-detail').hidden=true;
+  extra.hidden=true;
+  const x=session(), active=activePosts(x?.events??[]);
+  const sameRoute=x&&plans[x.route].date===p.date;
+  const pins=sameRoute?active.filter(v=>v.e.gps?.status==='fixed'):[];
+  const waiting=active.filter(v=>v.e.id===gpsPending?.id&&v.e.gps?.status==='pending').length;
+  const mode=testing?'テスト':'本番';
+  by('p-gps-summary').textContent=mode+'・'+day.value+(x&&!sameRoute?'　比較中の地図には、別ルートの投函地点を重ねません。':'　GPS '+pins.length+'件 ／ 未取得 '+(active.length-pins.length-waiting)+'件'+(waiting?' ／ 取得中 '+waiting+'件':'')+'。測位位置は郵便受けの正確な位置を示しません。');
+  const m=gpsMaps[p.date];
+  if(!pins.length||!m)return;
+  const groups={inside:[],outside:[]};
+  for(const v of pins){
+   const g=v.e.gps, [x,y]=mercator(g.lat,g.lon);
+   const u=m.px+(x-m.x)*m.scale, w=m.py+(y-m.y)*m.scale;
+   const inside=u>=m.px&&u<=m.right&&w>=m.py&&w<=m.bottom;
+   const bucket=groups[inside?'inside':'outside'];
+   const c=bucket.find(c=>Math.hypot((c.lon-g.lon)*111320*Math.cos(g.lat*Math.PI/180),(c.lat-g.lat)*111320)<=18);
+   if(c)c.posts.push(v);else bucket.push({posts:[v],lat:g.lat,lon:g.lon,x,y,u,w});
+  }
+  function pin(c,where,left,top){
+   const button=document.createElement('button');
+   button.type='button';button.className='posting-pin';
+   button.style.left=left+'%';button.style.top=top+'%';
+   button.textContent=c.posts.length>1?String(c.posts.length):'•';
+   button.setAttribute('aria-label',mode+'の投函地点 '+c.posts.length+'件');
+   button.onclick=()=>{
+    const d=by('p-gps-detail');
+    d.hidden=false;
+    d.textContent=mode+'・投函 '+c.posts.length+'件　'+c.posts.map(v=>timelineTime.format(new Date(v.e.at))+'（この投函で'+v.count+'通目、精度 約'+Math.round(v.e.gps.accuracy)+'m）').join(' ／ ');
+    d.scrollIntoView({block:'nearest'});
+   };
+   where.append(button);
+  }
+  for(const c of groups.inside)pin(c,layer,100*c.u/m.width,100*c.w/m.height);
+  if(groups.outside.length){
+   extra.hidden=false;
+   const xs=groups.outside.map(c=>c.x),ys=groups.outside.map(c=>c.y);
+   const x0=Math.min(...xs),y0=Math.min(...ys),span=Math.max(1,Math.max(...xs)-x0,Math.max(...ys)-y0);
+   for(const c of groups.outside)pin(c,survey,12+76*(c.x-x0)/span,12+76*(c.y-y0)/span);
+  }
  }
 
  const googleMaps={"starts":{"2026-12-01":[34.87695,139.119646],"2026-12-02":[34.879333,139.114021],"2026-12-03":[34.891255,139.126991],"2026-12-04":[34.89406,139.118481],"2026-12-05":[34.883949,139.113467],"2026-12-06":[34.883972,139.099817],"2026-12-07":[34.891438,139.097384],"2026-12-08":[34.893208,139.086179],"2026-12-09":[34.896941,139.115258],"2026-12-10":[34.905265,139.104384]},"positions":{"空":[34.8891969,139.1293697],"森":[34.8918939,139.1185593]}};
@@ -767,6 +901,16 @@ optForm.onsubmit=ev=>{
   const start=googleMaps.starts[p.date], home=googleMaps.positions[selectedSite];
   setDestination(by('p-google-start'),start);
   setDestination(by('p-google-home'),home);
+  const planned=gpsMaps[p.date]?.route, link=by('p-google-plan');
+  const href=planned&&routeURL(planned.end);
+  setDestination(link,planned?.end);
+  if(href){
+   const u=new URL(href);
+   u.searchParams.set('origin',planned.origin.join(','));
+   if(planned.waypoints.length)u.searchParams.set('waypoints',planned.waypoints.map(v=>v.join(',')).join('|'));
+   link.href=u.href;
+  }
+  by('p-google-plan-note').textContent=planned?'道順はGoogle側で再計算されます。渡すのは計画地点のみです。':'未確認の道路接続があるため、計画の道順はGoogleに渡しません。';
   by('p-google-start-note').textContent=start?'開始地点は計画上の座標です。現地で使える進入口を確認してください。':'開始地点の座標は未確認です。地図で確認してください。';
   by('p-google-home-note').textContent=home?selectedSite+'（登録済みの地図上の位置）。実入口と帰路の通行条件は現地で確認してください。':selectedSite?'「'+selectedSite+'」の実入口は未確認です。確定するまで帰路リンクを利用できません。':'設定で滞在施設を選択してください。';
  }
@@ -787,10 +931,11 @@ optForm.onsubmit=ev=>{
    if(navigator.onLine===false)throw Error('外部のGoogleマップには通信が必要です。同梱地図は利用できます。');
   }catch(err){e.preventDefault();info.textContent='Googleマップを開いていません。'+(err.message?.startsWith('外部の')?err.message:'保存領域を確認できません。記録を確認してから再試行してください。');}
  }
- for(const id of ['p-google-start','p-google-home'])by(id).addEventListener('click',verifyMapStorage);
+ for(const id of ['p-google-start','p-google-home','p-google-plan'])by(id).addEventListener('click',verifyMapStorage);
 
  function showMapError(failed){
   by('p-map-image').hidden=failed;
+  by('p-pin-layer').hidden=failed;
   by('p-map-fallback').hidden=!failed;
  }
  by('p-map-image').addEventListener('error',()=>showMapError(true));
@@ -819,7 +964,7 @@ optForm.onsubmit=ev=>{
   const list=by('p-timeline'), toggle=by('p-history-toggle');
   const events=x?.events??[];
   list.replaceChildren();
-  if(events.length)for(const e of events.slice(historyExpanded?0:-10).reverse())list.append(listItem(timelineTime.format(new Date(e.at))+'　'+actions[e.type]));
+  if(events.length)for(const e of events.slice(historyExpanded?0:-10).reverse())list.append(listItem(timelineTime.format(new Date(e.at))+'　'+actions[e.type]+(e.type==='plus'?' ／ '+gpsLabel(e):'')));
   else list.append(listItem(old?'旧日次実績には投函ごとの時刻がありません。':'日時付き履歴はまだありません。'));
   toggle.hidden=events.length<=10;
   toggle.textContent=historyExpanded?'閉じる':'すべて表示';
@@ -924,8 +1069,8 @@ optForm.onsubmit=ev=>{
  }
  by('p-history').onclick=()=>{
   if(testing)return;
-  const lines=[['実施日','施設','順路','操作','記録日時（日本時間）','記録日時（ISO）']];
-  for(const [d,x] of Object.entries(data).sort())for(const e of x.events)lines.push([d,x.site,plans[x.route].road,actions[e.type],timelineTime.format(new Date(e.at)),new Date(e.at).toISOString()]);
+  const lines=[['実施日','施設','順路','操作','記録日時（日本時間）','記録日時（ISO）','緯度','経度','GPS精度（m）','GPS状態']];
+  for(const [d,x] of Object.entries(data).sort())for(const e of x.events)lines.push([d,x.site,plans[x.route].road,actions[e.type],timelineTime.format(new Date(e.at)),new Date(e.at).toISOString(),e.gps?.status==='fixed'?e.gps.lat:'',e.gps?.status==='fixed'?e.gps.lon:'',e.gps?.status==='fixed'?e.gps.accuracy:'',e.type==='plus'?gpsLabel(e):'']);
   const csv=lines.map(r=>r.map(y=>'"'+String(y).replaceAll('"','""')+'"').join(',')).join('\r\n');
   download('AUFU-posting-history.csv','\uFEFF'+csv,'text/csv;charset=utf-8');
  };
