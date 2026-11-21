@@ -167,6 +167,22 @@ body{font-size:16px;line-height:1.5}
 .google-actions p{margin:6px 0 0;line-height:1.5;font-size:13px}
 .google-actions [aria-disabled=true]{background:#e5edf5!important;color:#38526b!important;border-color:#c0d0e0!important;cursor:default}
 #p-google-status:not(:empty){color:#69420e;background:#fff2dc;padding:6px 8px;border-radius:8px}
+</style><style>
+:root{--panel-radius:13px}
+.count-card,.time-card,#p-actions.operation-card,.map-stage,.google-actions,.posting-main .test-settings,.settings-fields{border-radius:var(--panel-radius)}
+#p-map{margin-inline:0}#p-map-area{margin-bottom:5px}
+.map-brief{margin:0 0 7px;font-size:13px;line-height:1.35;color:#594111}
+.map-stage #p-map-image{width:100%;height:auto;display:block}
+.map-safety-body{padding-bottom:10px}
+#p-map-safety summary{cursor:pointer}
+#p-test-status:empty{display:none}
+.test-clear-area{margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+#p-test-clear{font-size:13px;font-weight:650;color:#435970;background:#f6f8fb;min-height:44px}
+#p-actions .action-footer{display:block;margin-top:7px;border-top:1px solid #e2eaf1;padding-top:5px}
+#p-actions .action-footer .stop-note{margin:0 0 1px}
+#p-actions #p-save{display:block;min-height:19px;margin:0;font-size:12px;line-height:1.5;padding:0;border:0;border-radius:0;background:none;color:#435970}
+#p-actions #p-save[data-error=true]{display:block;background:#fff1df;color:#713517;margin-top:3px;border:1px solid #edd1ad;border-radius:7px;padding:4px 6px;font-weight:750}
+#p-history-toggle{width:100%;min-height:44px}
 </style><body><div id="posting">
  <header class="posting-head"><div class="header-row"><div class="brand">AUFU POSTING</div><button id="p-menu" class="plain" type="button" aria-label="設定" aria-controls="p-settings" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.7 3h4.6l.5 2.7 1.3.7 2.6-.9 2.3 4-2.1 1.8v1.5l2.1 1.8-2.3 4-2.6-.9-1.3.7-.5 2.6H9.7l-.5-2.6-1.3-.7-2.6.9-2.3-4 2.1-1.8v-1.5L3 9.5l2.3-4 2.6.9 1.3-.7z"/><circle cx="12" cy="12" r="2.8"/></svg><span>設定</span></button></div><div class="header-context"><p class="today" id="p-today"></p><span id="p-status" class="pill"></span></div></header>
  <p id="p-test-banner" class="test-banner" role="status" hidden>テスト中 <span>本番実績・予測には反映されません</span></p>
@@ -176,28 +192,30 @@ body{font-size:16px;line-height:1.5}
    <div class="count-card"><span>本日の投函</span><div class="number"><strong id="p-count">0</strong><span>通</span></div>
    <p id="p-plan"></p><progress id="p-progress" max="100" value="0" aria-label="目標進捗"></progress></div>
    <div class="time-card"><div><span>配布の経過</span><strong id="p-elapsed">—</strong></div><div><span>210分の残り</span><strong id="p-remaining">—</strong></div></div>
-   <p id="p-turn" class="muted"></p><p id="p-save" class="message" role="status"></p>  <div id="p-actions" class="operation-card"><p class="action-heading">配布操作</p>
+   <p id="p-turn" class="muted"></p>  <div id="p-actions" class="operation-card"><p class="action-heading">配布操作</p>
   <p id="p-disabled-reason" class="disabled-reason"><span id="p-next-step"></span> <button type="button" id="p-setup-shortcut" class="dock-link" hidden></button></p>
-  <div class="count-buttons"><button id="p-minus" type="button" class="plain" aria-describedby="p-undo-reason" aria-label="1通取り消す"><span aria-hidden="true">↶</span> 1通取り消す</button><span id="p-undo-reason" hidden></span><button id="p-plus" class="green" type="button" aria-describedby="p-disabled-reason">＋1通 投函</button></div><div class="dock-flow flow"><button type="button" id="p-primary" class="plain">施設を出発</button><button type="button" id="p-secondary" class="plain" hidden></button></div><p class="stop-note">安全な場所で停車してから操作</p></div>
+  <div class="count-buttons"><button id="p-minus" type="button" class="plain" aria-describedby="p-undo-reason" aria-label="1通取り消す"><span aria-hidden="true">↶</span> 1通取り消す</button><span id="p-undo-reason" hidden></span><button id="p-plus" class="green" type="button" aria-describedby="p-disabled-reason">＋1通 投函</button></div><div class="dock-flow flow"><button type="button" id="p-primary" class="plain">施設を出発</button><button type="button" id="p-secondary" class="plain" hidden></button></div><div class="action-footer"><p class="stop-note">安全な場所で停車してから操作</p><p id="p-save" class="message" role="status"></p></div></div>
 
    
   </section>
   <section id="p-map" hidden>
-   <h1>当日の地図</h1><p id="p-map-area"></p>
-   <p id="p-gaps" class="map-caution"></p>
-<div class="google-actions">
+   <div class="map-intro"><h1>当日の地図</h1><p id="p-map-area"></p><p id="p-map-brief" class="map-brief"></p></div>
+   <div class="map-stage"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
+   <div class="google-actions">
  <h2>Googleマップで移動を確認</h2>
  <div class="google-links">
   <a id="p-google-start" class="green" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-start-note">Googleマップで開始地点へ</a>
   <a id="p-google-home" class="plain" target="_blank" rel="noopener noreferrer" aria-describedby="p-google-home-note">Googleマップで帰路を確認</a>
  </div>
  <p id="p-google-start-note"></p><p id="p-google-home-note"></p>
- <p>Googleの案内は計画ルートと別です。自転車経路が出ない場合、徒歩経路は参考にとどめ、通行規制・私道の制限を優先してください。停車してから操作してください。</p>
+ 
  <p id="p-google-status" role="alert"></p>
-</div><div class="map-stage"><img id="p-map-image" alt="選択日の配布ルートと注意箇所"><div id="p-map-fallback" role="status" hidden><p>同梱地図を読み込めませんでした。開始・終了地点と道路の注意は下で確認できます。</p><button id="p-map-retry" class="plain" type="button">同梱地図を読み込み直す</button></div></div>
-   <ul class="map-key"><li><strong>開始</strong> <a id="p-start-map">開始地点</a></li><li><strong>終了</strong> <a id="p-end-map">配布終了・復路開始点</a></li><li><strong>折り返し</strong> 地図の終了地点が予定地点です。通行不可・接続不明・時間不足なら手前で戻ります。</li></ul>
-   <p id="p-slopes"></p>
+</div>
+   <details id="p-map-safety"><summary>安全・ルートに関する注意事項</summary>
+   <div class="map-safety-body"><p id="p-gaps" class="map-caution"></p><ul class="map-key"><li><strong>開始</strong> <a id="p-start-map">開始地点</a></li><li><strong>終了</strong> <a id="p-end-map">配布終了・復路開始点</a></li><li><strong>折り返し</strong> 地図の終了地点が予定地点です。通行不可・接続不明・時間不足なら手前で戻ります。</li></ul>
+   <p id="p-slopes"></p><p>Googleの案内は計画ルートと別です。自転車経路が出ない場合、徒歩経路は参考にとどめ、通行規制・私道の制限を優先してください。停車してから操作してください。</p>
    <button id="p-locate" type="button" class="plain">端末の現在地を確認</button><p id="p-coords" role="status"></p>
+   </div></details>
   </section>
   <section id="p-record" hidden>
    <h1>記録</h1><p id="p-record-summary"></p><div id="p-reconcile" hidden><p id="p-count-compare"></p></div>
@@ -217,14 +235,14 @@ body{font-size:16px;line-height:1.5}
 <h3>CSVバックアップ</h3><button id="field-export" type="button">日次実績のCSVを出力</button><p id="field-backup" role="status"></p>
 <label>日次実績CSVを読み込む<input id="field-import" type="file" accept=".csv,text/csv"></label><p id="field-import-status" role="status"></p>
 <p>日次実績が対象です。下にある道路別詳細記録は別集計で、従来の専用CSVから出力します。</p>
-<h3>未記録日の配布見込み</h3><div id="field-forecast" aria-live="polite"></div><p id="field-forecast-method"></p><details><summary>日別の基本予測と調整後予測</summary><ul id="field-forecast-days"></ul></details></section></div></details><h2>日時付き履歴</h2><ul id="p-timeline" class="timeline"></ul>
+<h3>未記録日の配布見込み</h3><div id="field-forecast" aria-live="polite"></div><p id="field-forecast-method"></p><details><summary>日別の基本予測と調整後予測</summary><ul id="field-forecast-days"></ul></details></section></div></details><h2>日時付き履歴</h2><ul id="p-timeline" class="timeline"></ul><button id="p-history-toggle" type="button" class="plain" aria-controls="p-timeline" aria-expanded="false" hidden>すべて表示</button>
   </section>
   <section id="p-settings" hidden>
    <h1>設定とデータ管理</h1>
    <section class="test-settings" aria-labelledby="p-test-title"><h2 id="p-test-title">テストモード</h2>
-   <label class="test-switch"><input type="checkbox" id="p-test-enable" role="switch" aria-describedby="p-test-status"><span id="p-test-label">テストモードをオン</span></label>
-   <p id="p-test-status" class="muted" role="status">OFFは本番モードです。ONにすると練習用の記録に切り替わります。</p>
-   <button id="p-test-clear" type="button" class="plain">テスト記録を一括削除</button></section>
+   <label class="test-switch"><input type="checkbox" id="p-test-enable" role="switch" aria-label="テストモード" aria-describedby="p-test-status"><span id="p-test-label">テストモード：オフ</span></label>
+   <p id="p-test-status" class="muted" role="status"></p>
+   <div class="test-clear-area"><button id="p-test-clear" type="button" class="plain">テスト記録を一括削除</button></div></section>
    <section class="settings-fields"><h2>配布の設定</h2><label>配布日<select id="p-date"></select></label><label>滞在施設<select id="p-site"><option value="">選択してください</option><option>空</option><option>森</option><option>燈</option><option>煖</option></select></label>
    <p class="muted">目標は既存の標準見込みです。日程を入れ替える場合は、実施日に対応するルートを選んでください。</p>
    <label>配布ルート<select id="p-route"></select></label><p id="p-settings-note" class="muted" role="status"></p></section>
@@ -670,7 +688,7 @@ optForm.onsubmit=ev=>{
   const state={prep:'準備中',travel:'準備中',run:'配布中',pause:'一時停止',return:'終了',done:'終了'}[phase];
   const count=x?t.count:old?.posts??0;
   by('p-test-enable').checked=testing;
-  by('p-test-label').textContent=testing?'テストモードをオフ（本番に戻る）':'テストモードをオン';
+  by('p-test-label').textContent=testing?'テストモード：オン':'テストモード：オフ';
   by('p-menu').setAttribute('aria-expanded',String(view==='settings'));
   by('p-test-banner').hidden=!testing;
   by('p-test-record-note').hidden=!testing;
@@ -729,6 +747,7 @@ optForm.onsubmit=ev=>{
   by('p-map-area').textContent=(mapPreview?'比較中の基本ルート '+p.date:day.value)+'　'+p.area+' · '+p.road;
   by('p-start-map').href=p.start;by('p-end-map').href=p.end;
   renderGoogleNavigation(p);
+  by('p-map-brief').textContent=p.gaps.length?'接続未確認 '+p.gaps.length+'箇所・坂道の注意あり':'坂道・通行条件は現地確認';
   by('p-gaps').textContent=p.gaps.length?'現地確認が必要：'+p.gaps.join('、')+'。接続を確認できない場合は手前で戻ります。':'既存資料に接続ギャップの注記なし。通行条件は当日確認。';
   by('p-slopes').textContent='坂道・通行注意　'+p.slopes+'。局所勾配は参考値です。急坂は安全な場所で降りて押し歩き。投函・立入禁止は除外。';
  }
@@ -788,16 +807,25 @@ optForm.onsubmit=ev=>{
   detail.textContent='カウンター '+(counter===null?'記録なし':counter+'通')+' ／ 確定済み日次実績 '+(daily?daily.posts+'通':'未確定')+'。'+(different?' 件数に差があります。履歴と日次実績を確認してください。予測には確定済みの日次実績を使います。':counter!==null&&!daily?' 帰着後に日次実績を確認・確定してください。':'');
  }
  function listItem(label){const li=document.createElement('li');li.textContent=label;return li;}
+ let historyExpanded=false,historyContext='';
  function renderRecords(){
+  const context=stateKey+':'+day.value;
+  if(historyContext!==context){historyContext=context;historyExpanded=false;}
   updateReconciliation();
   by('p-backup-card').hidden=testing;
   const x=session(), old=previous();
   const count=x?summarize(x.events).count:old?.posts??0;
   by('p-record-summary').textContent=day.value+'　'+count+'通'+(testing?'（テスト記録）':x?'（投函カウンター）':old?'（保存済み日次実績）':'（記録なし）');
-  const list=by('p-timeline');list.replaceChildren();
-  if(x)for(const e of x.events.slice().reverse())list.append(listItem(timelineTime.format(new Date(e.at))+'　'+actions[e.type]));
+  const list=by('p-timeline'), toggle=by('p-history-toggle');
+  const events=x?.events??[];
+  list.replaceChildren();
+  if(events.length)for(const e of events.slice(historyExpanded?0:-10).reverse())list.append(listItem(timelineTime.format(new Date(e.at))+'　'+actions[e.type]));
   else list.append(listItem(old?'旧日次実績には投函ごとの時刻がありません。':'日時付き履歴はまだありません。'));
+  toggle.hidden=events.length<=10;
+  toggle.textContent=historyExpanded?'閉じる':'すべて表示';
+  toggle.setAttribute('aria-expanded',String(historyExpanded&&!toggle.hidden));
  }
+ by('p-history-toggle').onclick=()=>{historyExpanded=!historyExpanded;renderRecords();};
  function open(tab,preview=null){
   mapPreview=preview;view=tab;
   for(const k of ['distribute','map','record','settings'])by('p-'+k).hidden=tab!==k;
@@ -927,6 +955,13 @@ optForm.onsubmit=ev=>{
   }catch(e){note.textContent='復元できませんでした。'+e.message;}
   finally{input.value='';}
  };
+ let testNoticeTimer;
+ function showTestNotice(text,temporary=true){
+  const message=by('p-test-status');
+  clearTimeout(testNoticeTimer);
+  message.textContent=text;
+  if(temporary)testNoticeTimer=setTimeout(()=>{message.textContent='';},3500);
+ }
  by('p-test-enable').onchange=e=>{
   const enabled=e.target.checked;
   testing=enabled;stateKey=enabled?testKey:liveKey;
@@ -934,18 +969,17 @@ optForm.onsubmit=ev=>{
   try{sessionStorage.setItem(modeKey,enabled?'on':'off');}catch{remembered=false;}
   data={};lastTap=0;message='';error=false;
   reload();useDate();
-  by('p-test-status').textContent=(enabled?'テストモードに切り替えました。':'本番モードに戻りました。当日の配布のみ記録できます。')+(remembered?'':' 再読み込み時は通常モードで開きます。');
+  showTestNotice((enabled?'テストモードに切り替えました。':'本番モードに戻りました。')+(remembered?'':' 再読み込み時は通常モードで開きます。'),remembered);
  };
  by('p-test-clear').onclick=()=>{
-  const note=by('p-test-status');
-  if(!confirm('すべてのテスト記録を削除しますか？'))return;
+  if(!confirm('テスト記録だけをすべて削除しますか？ 本番データは削除されません。'))return;
   try{
    localStorage.removeItem(testKey);
    localStorage.removeItem(testKey+'-selection');
    localStorage.removeItem(testKey+'-draft');
    if(testing){data={};message='';error=false;lastTap=0;reload();useDate();}
-   note.textContent='テスト記録を削除しました。本番実績は保持されています。';
-  }catch{note.textContent='テスト記録を削除できませんでした。';}
+   showTestNotice('テスト記録を削除しました。本番実績は保持されています。');
+  }catch{showTestNotice('テスト記録を削除できませんでした。',false);}
  };
  useDate();setInterval(tick,1000);
 })();
